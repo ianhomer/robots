@@ -19,7 +19,8 @@ min_positions = [absolute_max_position] * number_of_pins
 max_position = [absolute_min_position] * number_of_pins
 range_positions = [None] * number_of_pins
 
-range_positions[claw_pin] = [4000,6000]
+range_positions[claw_pin] = [6500,9000]
+positions[claw_pin] = 7000
 range_positions[shoulder_pin] = [4000,6000]
 range_positions[elbow_pin] = [4000,6000]
 range_positions[rotate_pin] = [4000,6000]
@@ -53,13 +54,16 @@ for pin in range(0, number_of_pins):
 def moveTo(percentage, pin = 1):
     if (percentage < 0 or percentage > 100):
         raise(f'Move to position should be between 0 and 100, it was {position}')
+    pwm = PWM(Pin(pin))
+    pwm.freq(50)
     target_position = range_positions[pin][0] + increment * int(int(range_deltas[pin] * percentage / 100) / increment)
     print(f'Moving {pin} to {percentage}% = from position {positions[pin]} to {target_position}')
     delta = increment if target_position > positions[pin] else -increment
     for position in range(positions[pin], target_position, delta):
-        pwms[pin].duty_u16(position)
+        pwm.duty_u16(position)
         sleep(0.01)
     positions[pin] = target_position
+    pwm.deinit()
 
 def rotateTo(percentage):
     moveTo(percentage, rotate_pin)
@@ -67,13 +71,28 @@ def rotateTo(percentage):
 def clawTo(percentage):
     moveTo(percentage, claw_pin)
     
+def shoulderTo(percentage):
+    moveTo(percentage, shoulder_pin)
+
 def testRotate():
     rotateTo(0)
     rotateTo(100)
+    flashLed()
+    pause()
 
 def testClaw():
     clawTo(0)
     clawTo(100)
+    clawTo(50)
+    flashLed()
+    pause()
+    
+def testShoulder():
+    shoulderTo(0)
+    shoulderTo(100)
+    shoulderTo(50)
+    flashLed()
+    pause()
 
 def flashLed(count=1):
     for i in range(0,count * 2):
@@ -82,11 +101,13 @@ def flashLed(count=1):
         
 def pause():
     print("pause")
-    sleep(0.5)
+    sleep(1)
 
 while True:
     flashLed(3)
     testRotate()
     flashLed()
     testClaw()
+    flashLed()
+    testShoulder()
     pause()
