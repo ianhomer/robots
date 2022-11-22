@@ -19,9 +19,9 @@ min_positions = [absolute_max_position] * number_of_pins
 max_position = [absolute_min_position] * number_of_pins
 range_positions = [None] * number_of_pins
 
-range_positions[claw_pin] = [6500,9000]
+range_positions[claw_pin] = [6200,9000]
 positions[claw_pin] = 7000
-range_positions[shoulder_pin] = [4000,6000]
+range_positions[shoulder_pin] = [4000,9000]
 range_positions[elbow_pin] = [4000,6000]
 range_positions[rotate_pin] = [4000,6000]
 
@@ -71,6 +71,12 @@ def rotateTo(percentage):
 def clawTo(percentage):
     moveTo(percentage, claw_pin)
     
+def openClaw():
+    clawTo(100)
+
+def closeClaw():
+    clawTo(0)
+    
 def shoulderTo(percentage):
     moveTo(percentage, shoulder_pin)
 
@@ -102,8 +108,8 @@ def flashLed(count=1):
 def pause():
     print("pause")
     sleep(1)
-
-while True:
+    
+def calibrate():
     flashLed(3)
     testRotate()
     flashLed()
@@ -111,3 +117,23 @@ while True:
     flashLed()
     testShoulder()
     pause()
+    
+def pickup():
+    flashLed(3)
+    rotateTo(0)
+    openClaw()
+    shoulderTo(55)
+    closeClaw()
+    shoulderTo(30)
+    rotateTo(50)
+    shoulderTo(70)
+    openClaw()
+    shoulderTo(30)
+    rotateTo(0)
+    closeClaw()
+    pause()
+
+#while True:
+    #calibrate()
+    
+pickup()
