@@ -1,2 +1,5 @@
-# robots
-Robots for code clubs
+# Robots
+
+Robots for code clubs.
+
+Install and run from [thonny](https://thonny.org/).
