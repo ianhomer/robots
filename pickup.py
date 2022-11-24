@@ -64,6 +64,7 @@ def moveTo(percentage, pin = 1):
         print(f'Finished moving {pin} to {target_position}')
     finally:
         print(f'Closing pin {pin}')
+        # deinit must be in a finally otherwise motor might blow on programme stop
         pwm.deinit()
 
 def rotateTo(percentage):
