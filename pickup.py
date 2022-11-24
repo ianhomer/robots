@@ -112,11 +112,11 @@ def pause():
     
 def calibrate():
     flashLed(3)
-    #testRotate()
-    #flashLed()
+    testRotate()
+    flashLed()
     testClaw()
-    #flashLed()
-    #testShoulder()
+    flashLed()
+    testShoulder()
     pause()
     
 def pickup():
