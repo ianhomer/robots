@@ -54,16 +54,20 @@ for pin in range(0, number_of_pins):
 def moveTo(percentage, pin = 1):
     if (percentage < 0 or percentage > 100):
         raise(f'Move to position should be between 0 and 100, it was {position}')
-    pwm = PWM(Pin(pin))
-    pwm.freq(50)
     target_position = range_positions[pin][0] + increment * int(int(range_deltas[pin] * percentage / 100) / increment)
     print(f'Moving {pin} to {percentage}% = from position {positions[pin]} to {target_position}')
-    delta = increment if target_position > positions[pin] else -increment
-    for position in range(positions[pin], target_position, delta):
-        pwm.duty_u16(position)
-        sleep(0.01)
-    positions[pin] = target_position
-    pwm.deinit()
+    pwm = PWM(Pin(pin))
+    try:
+        pwm.freq(50)
+        delta = increment if target_position > positions[pin] else -increment
+        for position in range(positions[pin], target_position, delta):
+            pwm.duty_u16(position)
+            sleep(0.01)
+        positions[pin] = target_position
+        print(f'Finished moving {pin} to {target_position}')
+    finally:
+        print(f'Closing pin {pin}')
+        pwm.deinit()
 
 def rotateTo(percentage):
     moveTo(percentage, rotate_pin)
@@ -111,11 +115,11 @@ def pause():
     
 def calibrate():
     flashLed(3)
-    testRotate()
-    flashLed()
+    #testRotate()
+    #flashLed()
     testClaw()
-    flashLed()
-    testShoulder()
+    #flashLed()
+    #testShoulder()
     pause()
     
 def pickup():
@@ -133,7 +137,7 @@ def pickup():
     closeClaw()
     pause()
 
-#while True:
-    #calibrate()
+while True:
+    calibrate()
     
-pickup()
+#pickup()
