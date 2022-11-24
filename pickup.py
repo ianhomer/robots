@@ -21,7 +21,7 @@ range_positions = [None] * number_of_pins
 
 range_positions[claw_pin] = [6200,9000]
 positions[claw_pin] = 7000
-range_positions[shoulder_pin] = [4000,9000]
+range_positions[shoulder_pin] = [3000,6500]
 range_positions[elbow_pin] = [4000,6000]
 range_positions[rotate_pin] = [4000,6000]
 
