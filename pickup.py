@@ -29,18 +29,14 @@ led = machine.Pin(25, machine.Pin.OUT)
 
 range_deltas = [None] * number_of_pins
 
-def createPwm(pin):
-    pwm = PWM(Pin(pin))
-    pwm.freq(50)
-    pwm.duty_u16(positions[pin])
-    sleep(0.2)
-    return pwm
+def roundToIncrement(number):
+    return increment * int(number / increment)
 
 pwms = [None] * number_of_pins
 for pin in range(0, number_of_pins):
-    print(f'Creating pin {pin} : range : {range_positions[pin]}')
+    print(f'Initialising pin {pin} : range : {range_positions[pin]}')
     range_deltas[pin] = range_positions[pin][1] - range_positions[pin][0]
-    print(range_positions)
+    positions[pin] = roundToIncrement(range_positions[pin][0] + range_deltas[pin] / 2)  
     # Safety checks to reduce risk of blowing servo motors.
     if (range_deltas[pin] < 0):
         raise(f'Min greater than max for pin {pin}. {range_position}')
@@ -49,21 +45,26 @@ for pin in range(0, number_of_pins):
     if (range_positions[pin][1] > absolute_max_position):
         raise(f'Max position for pin {pin} is above absolute maximum {absolute_max_position}, it is {range_positions[pin][1]}')    
 
-    pwms[pin] = createPwm(pin)
+print(f'Range {range_positions}')
+print(f'Start {positions}')
 
 def moveTo(percentage, pin = 1):
     if (percentage < 0 or percentage > 100):
         raise(f'Move to position should be between 0 and 100, it was {position}')
-    pwm = PWM(Pin(pin))
-    pwm.freq(50)
-    target_position = range_positions[pin][0] + increment * int(int(range_deltas[pin] * percentage / 100) / increment)
+    target_position = range_positions[pin][0] + roundToIncrement(range_deltas[pin] * percentage / 100)
     print(f'Moving {pin} to {percentage}% = from position {positions[pin]} to {target_position}')
-    delta = increment if target_position > positions[pin] else -increment
-    for position in range(positions[pin], target_position, delta):
-        pwm.duty_u16(position)
-        sleep(0.01)
-    positions[pin] = target_position
-    pwm.deinit()
+    pwm = PWM(Pin(pin))
+    try:
+        pwm.freq(50)
+        delta = increment if target_position > positions[pin] else -increment
+        for position in range(positions[pin], target_position, delta):
+            pwm.duty_u16(position)
+            sleep(0.01)
+        positions[pin] = target_position
+        print(f'Finished moving {pin} to {target_position}')
+    finally:
+        print(f'Closing pin {pin}')
+        pwm.deinit()
 
 def rotateTo(percentage):
     moveTo(percentage, rotate_pin)
@@ -133,7 +134,7 @@ def pickup():
     closeClaw()
     pause()
 
-#while True:
-    #calibrate()
+while True:
+    calibrate()
     
-pickup()
+#pickup()
